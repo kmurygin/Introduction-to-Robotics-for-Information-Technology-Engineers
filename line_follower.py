@@ -7,9 +7,15 @@ from time import sleep
 from enum import Enum
 
 
-DRIVING_SPEED = 7
-TURN_SPEED = 10
+DRIVING_SPEED = 12
+TURN_SPEED = 4
 
+# 8, 9
+
+# almost working
+# TURN_SPEED = 15 -> 13
+# DRIVING_SPEED = 8 -> 10
+# 2.5, 2
 
 class Direction(Enum):
     LEFT = 0
@@ -25,7 +31,7 @@ class Robot:
         self.left_colour = ColorSensor(INPUT_2)
         self.right_colour = ColorSensor(INPUT_1)
 
-        self.touch_sensor = TouchSensor(INPUT_3)
+        # self.touch_sensor = TouchSensor(INPUT_3)
 
 
     def calibrate_sensors(self):
@@ -33,7 +39,7 @@ class Robot:
         self.right_colour.calibrate_white()
         self.left_colour.calibrate_white()
         print("[ROBOT] Calibration finished")
-        sleep(5)
+        sleep(1)
 
 
     def get_current_colour(self, colour_sensor):
@@ -65,17 +71,23 @@ class Robot:
                 print("[ROBOT] Turning right")
                 self.right_motor.on(SpeedPercent(-(TURN_SPEED-2.5)))
                 self.left_motor.on(SpeedPercent(TURN_SPEED-2))
+                # self.right_motor.on(SpeedPercent(-(.5)))
+                # self.left_motor.on(SpeedPercent(TURN_SPEED))
             else:
                 print("[ROBOT] Turning left")
                 self.left_motor.on(SpeedPercent(-(TURN_SPEED-2.5)))
                 self.right_motor.on(SpeedPercent(TURN_SPEED-2))
+                # self.right_motor.on(SpeedPercent(TURN_SPEED))
+                # self.left_motor.on(SpeedPercent(-0.5))
             
             left_colour, right_colour = self.get_colours()
 
-            print("[LEFT SENSOR] Left colour: {}".fomat(left_colour))
-            print("[RIGHT SENSOR] Right colour: {right_colour}")
+            # print("[LEFT SENSOR] Left colour:" + left_colour)
+            # print("[RIGHT SENSOR] Right colour:" + right_colour)
 
-            if right_colour == "black" or left_colour == "black":
+            if right_colour == "black" and left_colour == "black":
+                print("[LEFT SENSOR] Left colour:" + left_colour)
+                print("[RIGHT SENSOR] Right colour:" + right_colour)
                 break
 
             if right_colour == "white" and left_colour == "white":
@@ -92,22 +104,22 @@ def main():
 
     while True:
         try:
-            if robot.touch_sensor.is_pressed:
-                robot.stop()
-                break
+            # if robot.touch_sensor.is_pressed:
+            #     robot.stop()
+            #     break
             left_colour, right_colour = robot.get_colours()
             if right_colour == "black" and left_colour == "white":
                 robot.adjust_direction(Direction.RIGHT)
             elif right_colour == "white" and left_colour == "black":
                 robot.adjust_direction(Direction.LEFT)
-            
             else:
-                print("[LEFT SENSOR] Left colour: {left_colour}")
-                print("[RIGHT SENSOR] Right colour: {right_colour}")
+                if right_colour == "black" and left_colour == "black":
+                    print("[LEFT SENSOR] Left colour:" + left_colour)
+                    print("[RIGHT SENSOR] Right colour:" + right_colour)
                 robot.drive_forward()
 
         except Exception as e:
-            print("[ERROR] {e}")
+            print("[ERROR]" + str(e))
             continue
 
 
