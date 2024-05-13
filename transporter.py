@@ -34,21 +34,19 @@ class Robot:
 
         self.item: bool = False
         self.color = None
-        self.field_colors = ["Red", "Green", "Blue"]
-        self.blacks = ["Black"]
+        self.field_colors = ["red", "green", "blue"]
+        self.blacks = ["black"]
         self.turn = ""
 
         self.driving_speed = driving_speed
         self.turning_speed = turning_speed
-
 
     def calibrate_sensors(self):
         print("[ROBOT] Calibration started")
         self.right_colour.calibrate_white()
         self.left_colour.calibrate_white()
         print("[ROBOT] Calibration finished")
-        sleep(1)
-
+        sleep(1) #additional sleep to make sure everything is well calibrated
 
     def get_current_colour(self, colour_sensor):
         r_param, g_param, b_param = colour_sensor.rgb
@@ -62,10 +60,8 @@ class Robot:
             return "black"
         return "white"
 
-
     def get_colours(self):
         return self.get_current_colour(self.left_colour), self.get_current_colour(self.right_colour)
-
 
     def drive_forward(self):
         print("[ROBOT] Driving forward")
@@ -75,7 +71,6 @@ class Robot:
     def drive_straight_back(self):
         self.motor_left.on(SpeedPercent(-self.driving_speed))
         self.motor_right.on(SpeedPercent(-self.driving_speed))
-
 
     def adjust_direction(self, direction=Direction.LEFT):
         while True:
@@ -120,7 +115,6 @@ class Robot:
         self.right_motor.on(SpeedPercent(-self.driving_speed))
         sleep(1) #changed sleep value
 
-
     def turn_left(self):
         print("[ROBOT] Turning left")
         self.left_motor.on(SpeedPercent(-self.driving_speed))
@@ -151,9 +145,8 @@ class Robot:
         print("[ROBOT] The item has been picked up")
         sleep(1.5)
         self.turn_back()
-        COLOR = "Blue"
-        self.blacks.append("Red")
-
+        self.color = "blue"
+        self.blacks.append("red")
 
     def put_down_the_item(self):
         self.motor_right.on(SpeedPercent(self.driving_speed))
@@ -168,7 +161,7 @@ class Robot:
         self.item = False
         print("[ROBOT] The item has been put down")
         self.turn_back()
-        self.color = "Red"
+        self.color = "red"
 
     def turn_into_color_field(self, r_col, l_col, direction=0):
     # 0=left
