@@ -33,8 +33,8 @@ class Robot:
         self.infrared = InfraredSensor(INPUT_3)
 
         self.item: bool = False
-        self.color = None
-        self.field_colors = ["red", "green", "blue"]
+        self.colour = None
+        self.fields = ["red", "green", "blue"]
         self.blacks = ["black"]
         self.turn = ""
 
@@ -69,8 +69,9 @@ class Robot:
         self.right_motor.on(SpeedPercent(self.driving_speed))
 
     def drive_straight_back(self):
-        self.motor_left.on(SpeedPercent(-self.driving_speed))
-        self.motor_right.on(SpeedPercent(-self.driving_speed))
+        print("[ROBOT] Driving backward")
+        self.left_motor.on(SpeedPercent(-self.driving_speed))
+        self.right_motor.on(SpeedPercent(-self.driving_speed))
 
     def adjust_direction(self, direction=Direction.LEFT):
         while True:
@@ -127,8 +128,8 @@ class Robot:
         # global BLACKS
         # search for the item
         while self.infrared.proximity > 25: #changed value, TODO adjust to the robot crane length
-            self.motor_left.on(SpeedPercent(-self.turning_speed))
-            self.motor_right.on(SpeedPercent(self.turning_speed))
+            self.left_motor.on(SpeedPercent(-self.turning_speed))
+            self.right_motor.on(SpeedPercent(self.turning_speed))
             sleep(0.5)
             print("[ROBOT] Distance: {}".format(self.infrared.proximity))
 
@@ -136,8 +137,8 @@ class Robot:
             self.dr()
 
         # ready to pick up item
-        self.motor_left.on(SpeedPercent(0))
-        self.motor_right.on(SpeedPercent(0))
+        self.left_motor.on(SpeedPercent(0))
+        self.right_motor.on(SpeedPercent(0))
         self.medium_motor.on_for_degrees(SpeedPercent(5), -60)
         sleep(2)
         self.drive_straight_back()
@@ -149,11 +150,11 @@ class Robot:
         self.blacks.append("red")
 
     def put_down_the_item(self):
-        self.motor_right.on(SpeedPercent(self.driving_speed))
-        self.motor_left.on(SpeedPercent(self.driving_speed))
+        self.right_motor.on(SpeedPercent(self.driving_speed))
+        self.left_motor.on(SpeedPercent(self.driving_speed))
         sleep(2.5)
-        self.motor_right.on(SpeedPercent(0))
-        self.motor_left.on(SpeedPercent(0))
+        self.right_motor.on(SpeedPercent(0))
+        self.left_motor.on(SpeedPercent(0))
         self.medium_motor.on_for_degrees(SpeedPercent(5), 60)
         sleep(2)
         self.drive_straight_back()
@@ -163,13 +164,13 @@ class Robot:
         self.turn_back()
         self.color = "red"
 
-    def turn_into_colour_field(self, right_colour, left_colour, direction=0):
+    def turn_into_colour_field(self, right_colour, left_colour, direction=Direction.LEFT):
     # 0=left
     # 1=right
 
         field_color = left_colour
         turn_name = 'LEFT'
-        if direction:
+        if direction == Direction.RIGHT:
             field_color = right_colour
             turn_name = 'RIGHT'
         #self.print_colors(r_col, l_col)
@@ -182,6 +183,9 @@ class Robot:
         else:
             self.turn_left()
         self.turn = turn_name
+
+
+
 
     def run(self):
         while True:
@@ -199,8 +203,8 @@ class Robot:
                 elif right_colour in self.fields and left_colour in self.fields:
                     # inside field color
                     print("[ROBOT] Field colour detcted")
-                    self.print_colors(right_colour, left_colour)
-                    left_colour, right_colour = self.get_colors()
+                    # self.print_colours(right_colour, left_colour)
+                    left_colour, right_colour = self.get_colours()
 
                     if not self.item:
                         self.pick_up_the_item()
@@ -210,47 +214,47 @@ class Robot:
                     while right_colour == self.get_colour(self.right_colour) and left_colour == self.get_color(self.left_colour):
                         # drive in color field until you're out of it
                         print("[ROBOT] Driving forward in color field")
-                        self.print_colors(right_colour, left_colour)
-                        left_colour, right_colour = self.get_colors()
+                        # self.print_colors(right_colour, left_colour)
+                        left_colour, right_colour = self.get_colours()
 
-                        self.drive_straight_forward()
+                        self.drive_forward()
 
-                    self.field_colors.remove("red")
+                    self.fields.remove("red")
 
-                elif right_colour in self.field_colors and left_colour == "white" and TURN == "" and (COLOR == "" or right_colour == COLOR):
+                elif right_colour in self.fields and left_colour == "white" and self.turn == "" and (self.colour == "" or right_colour == self.colour):
                     # turn right and drive straight forward until there is the same color on both sensors
-                    self.turn_into_color_field(right_colour, left_colour, direction=Direction.RIGHT)
+                    self.turn_into_colour_field(right_colour, left_colour, direction=Direction.RIGHT)
 
-                elif left_colour in self.field_colors and right_colour == "white" and TURN == "" and (COLOR == "" or left_colour == COLOR):
+                elif left_colour in self.fields and right_colour == "white" and self.turn == "" and (self.colour == "" or left_colour == self.colour):
                     # turn left and drive straight forward until there is the same color on both sensors
-                    self.turn_into_color_field(right_colour, left_colour, direction=Direction.LEFT)
+                    self.turn_into_colour_field(right_colour, left_colour, direction=Direction.LEFT)
 
-                elif right_colour in self.blacks and left_colour in self.blacks and TURN == "LEFT":
+                elif right_colour in self.blacks and left_colour in self.blacks and self.turn == "LEFT":
                     # turn right to go back on the track after exiting color field
                     print("[ROBOT] Turning left- double black detected")
                     sleep(1.5)
-                    self.turn_90_left()
-                    TURN = ''
+                    self.turn_left()
+                    self.turn = ''
                     self.blacks.remove("red")
                     if not self.item:
-                        COLOR = ''
+                        self.colour = ''
 
-                elif right_colour in self.blacks and left_colour in self.blacks and TURN == "RIGHT":
+                elif right_colour in self.blacks and left_colour in self.blacks and self.turn == "RIGHT":
                     # turn left to go back on the track after exiting color field
                     print("[ROBOT] Turning right- double black detected")
                     sleep(1.5)
-                    self.turn_90_right()
-                    TURN = ''
+                    self.turn_right()
+                    self.turn = ''
                     self.blacks.remove("red")
                     if not self.item:
-                        COLOR = ''
+                        self.colour = ''
 
                 else:
                     # continue straight
-                    self.print_colors(right_colour, left_colour)
-                    self.print_rgb()
+                    # self.print_colors(right_colour, left_colour)
+                    # self.print_rgb()
                     print("[ROBOT] Driving forward")
-                    self.drive_straight_forward()
+                    self.drive_forward()
 
             except Exception:
                 continue
