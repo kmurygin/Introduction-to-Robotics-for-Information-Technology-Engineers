@@ -7,14 +7,14 @@ from time import sleep
 from enum import Enum
 
 
-DRIVING_SPEED = 12
+DRIVING_SPEED = 10
 TURN_SPEED = 4
 
 # 8, 9
 
 # almost working
 # TURN_SPEED = 15 -> 13
-# DRIVING_SPEED = 8 -> 10
+# DRIVING_SPEED = 8 ->10
 # 2.5, 2
 
 class Direction(Enum):
@@ -26,11 +26,11 @@ class Robot:
     def __init__(self):
         self.left_motor = LargeMotor(OUTPUT_A)
         self.right_motor = LargeMotor(OUTPUT_B)
-        # self.medium_motor = LargeMotor(OUTPUT_D)
+        self.medium_motor = MediumMotor(OUTPUT_D)
 
         self.left_colour = ColorSensor(INPUT_2)
-        self.right_colour = ColorSensor(INPUT_1)
-
+        self.right_colour = ColorSensor(INPUT_3)
+        self.infrared = InfraredSensor(INPUT_1)
         # self.touch_sensor = TouchSensor(INPUT_3)
 
 
