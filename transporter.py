@@ -7,13 +7,13 @@ from time import sleep
 from enum import Enum
 
 DRIVING_SPEED = 7
-TURN_SPEED = 7
+TURNING_SPEED = 7
 ROT_TIME=2.20
 # BLACKS=['Black'] #TODO, change to class field
 # 8, 9
 
 # almost working
-# TURN_SPEED = 15 -> 13
+# self.turning_speed = 15 -> 13
 # DRIVING_SPEED = 8 -> 10
 # 2.5, 2
 
@@ -23,7 +23,7 @@ class Direction(Enum):
 
 
 class Robot:
-    def __init__(self):
+    def __init__(self, driving_speed=DRIVING_SPEED, turning_speed=TURNING_SPEED):
         self.left_motor = LargeMotor(OUTPUT_A)
         self.right_motor = LargeMotor(OUTPUT_B)
         self.medium_motor = LargeMotor(OUTPUT_D)
@@ -37,6 +37,9 @@ class Robot:
         self.field_colors = ["Red", "Green", "Blue"]
         self.blacks = ["Black"]
         self.turn = ""
+
+        self.driving_speed = driving_speed
+        self.turning_speed = turning_speed
 
 
     def calibrate_sensors(self):
@@ -66,25 +69,25 @@ class Robot:
 
     def drive_forward(self):
         print("[ROBOT] Driving forward")
-        self.left_motor.on(SpeedPercent(DRIVING_SPEED))
-        self.right_motor.on(SpeedPercent(DRIVING_SPEED))
+        self.left_motor.on(SpeedPercent(self.driving_speed))
+        self.right_motor.on(SpeedPercent(self.driving_speed))
 
     def drive_straight_back(self):
-        self.motor_left.on(SpeedPercent(-DRIVING_SPEED))
-        self.motor_right.on(SpeedPercent(-DRIVING_SPEED))
+        self.motor_left.on(SpeedPercent(-self.driving_speed))
+        self.motor_right.on(SpeedPercent(-self.driving_speed))
 
 
     def adjust_direction(self, direction=Direction.LEFT):
         while True:
             if direction == Direction.RIGHT:
                 print("[ROBOT] Turning right")
-                self.right_motor.on(SpeedPercent(-(TURN_SPEED-2.5)))
-                self.left_motor.on(SpeedPercent(TURN_SPEED-2))
+                self.right_motor.on(SpeedPercent(-(self.turning_speed-2.5)))
+                self.left_motor.on(SpeedPercent(self.turning_speed-2))
 
             else:
                 print("[ROBOT] Turning left")
-                self.left_motor.on(SpeedPercent(-(TURN_SPEED-2.5)))
-                self.right_motor.on(SpeedPercent(TURN_SPEED-2))
+                self.left_motor.on(SpeedPercent(-(self.turning_speed-2.5)))
+                self.right_motor.on(SpeedPercent(self.turning_speed-2))
             
             left_colour, right_colour = self.get_colours()
 
@@ -107,19 +110,21 @@ class Robot:
 
     def turn_back(self):
         print("[ROBOT] Turning 180 degrees")
-        self.left_motor.on(SpeedPercent(-DRIVING_SPEED))
-        self.right_motor.on(SpeedPercent(DRIVING_SPEED))
+        self.left_motor.on(SpeedPercent(-self.driving_speed))
+        self.right_motor.on(SpeedPercent(self.driving_speed))
         sleep(2) # changed sleep value
 
     def turn_right(self):
-        self.left_motor.on(SpeedPercent(DRIVING_SPEED))
-        self.right_motor.on(SpeedPercent(-DRIVING_SPEED))
+        print("[ROBOT] Turning right")
+        self.left_motor.on(SpeedPercent(self.driving_speed))
+        self.right_motor.on(SpeedPercent(-self.driving_speed))
         sleep(1) #changed sleep value
 
 
     def turn_left(self):
-        self.left_motor.on(SpeedPercent(-DRIVING_SPEED))
-        self.right_motor.on(SpeedPercent(DRIVING_SPEED))
+        print("[ROBOT] Turning left")
+        self.left_motor.on(SpeedPercent(-self.driving_speed))
+        self.right_motor.on(SpeedPercent(self.driving_speed))
         sleep(1) #changed sleep value
 
     def pick_up_the_item(self):
@@ -128,8 +133,8 @@ class Robot:
         # global BLACKS
         # search for the item
         while self.infrared.proximity > 25: #changed value, TODO adjust to the robot crane length
-            self.motor_left.on(SpeedPercent(-TURN_SPEED))
-            self.motor_right.on(SpeedPercent(TURN_SPEED))
+            self.motor_left.on(SpeedPercent(-self.turning_speed))
+            self.motor_right.on(SpeedPercent(self.turning_speed))
             sleep(0.5)
             print("[ROBOT] Distance: {}".format(self.infrared.proximity))
 
@@ -151,8 +156,8 @@ class Robot:
 
 
     def put_down_the_item(self):
-        self.motor_right.on(SpeedPercent(DRIVING_SPEED))
-        self.motor_left.on(SpeedPercent(DRIVING_SPEED))
+        self.motor_right.on(SpeedPercent(self.driving_speed))
+        self.motor_left.on(SpeedPercent(self.driving_speed))
         sleep(2.5)
         self.motor_right.on(SpeedPercent(0))
         self.motor_left.on(SpeedPercent(0))
@@ -221,11 +226,11 @@ class Robot:
 
                 elif r_col in self.field_colors and l_col == "white" and TURN == "" and (COLOR == "" or r_col == COLOR):
                     # turn right and drive straight forward until there is the same color on both sensors
-                    self.turn_into_color_field(r_col, l_col, direction=1)
+                    self.turn_into_color_field(r_col, l_col, direction=Direction.RIGHT)
 
                 elif l_col in self.field_colors and r_col == "white" and TURN == "" and (COLOR == "" or l_col == COLOR):
                     # turn left and drive straight forward until there is the same color on both sensors
-                    self.turn_into_color_field(r_col, l_col, direction=0)
+                    self.turn_into_color_field(r_col, l_col, direction=Direction.LEFT)
 
                 elif r_col in self.blacks and l_col in self.blacks and TURN == "LEFT":
                     # turn right to go back on the track after exiting color field
