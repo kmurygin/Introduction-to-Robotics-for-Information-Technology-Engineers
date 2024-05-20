@@ -143,7 +143,8 @@ class Robot:
             print("Distance: {}".format(self.infrared.proximity))
 
         # bylo 7
-        while self.infrared.proximity >= 10:
+        # bylo 8
+        while self.infrared.proximity >= 6:
             self.drive_forward()
             print("Distance: {}".format(self.infrared.proximity))
 
@@ -164,7 +165,7 @@ class Robot:
     def put_down_the_item(self):
         self.right_motor.on(SpeedPercent(self.turn_speed))
         self.left_motor.on(SpeedPercent(self.turn_speed))
-        sleep(1.5)
+        sleep(.5)
         self.right_motor.on(SpeedPercent(0))
         self.left_motor.on(SpeedPercent(0))
         self.medium_motor.on_for_degrees(SpeedPercent(5), -60)
