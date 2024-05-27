@@ -8,7 +8,7 @@ from enum import Enum
 
 
 DRIVING_SPEED = 10
-TURN_SPEED = 4
+TURN_SPEED = 7
 
 # 8, 9
 

@@ -35,7 +35,7 @@ class Robot:
         self.turn = ''
         self.item = False
         self.colour = 'Red'
-        self.driving_speed = 7
+        self.driving_speed = 8
         self.turn_speed = 7
         self.rot_time = 3
         self.blacks = ['Black']
@@ -143,8 +143,8 @@ class Robot:
             print("Distance: {}".format(self.infrared.proximity))
 
         # bylo 7
-        # bylo 8
-        while self.infrared.proximity >= 6:
+        # bylo 8, 6, 4
+        while self.infrared.proximity >= 2:
             self.drive_forward()
             print("Distance: {}".format(self.infrared.proximity))
 
