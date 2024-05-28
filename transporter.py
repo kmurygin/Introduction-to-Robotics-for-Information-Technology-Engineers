@@ -5,16 +5,6 @@ from enum import Enum
 from ev3dev2.motor import LargeMotor, MediumMotor, OUTPUT_A, OUTPUT_B, OUTPUT_D, SpeedPercent
 from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3
 from ev3dev2.sensor.lego import ColorSensor, InfraredSensor
-# from ev3dev2.sound import Sound
-
-# TURN=''
-# ITEM=False
-# COLOR='Red'
-# DRIVING_SPEED=7
-# TURN_SPEED=7
-# ROT_TIME=2.70
-# BLACKS=['Black']
-# FIELDS_COLORS=["Red", "Green", "Blue"]
 
 
 class Direction(Enum):
@@ -48,7 +38,6 @@ class Robot:
         print("[ROBOT] Calibration finished")
         sleep(2)
 
-
     def get_current_colour(self, colour_sensor):
         r_param, g_param, b_param = colour_sensor.rgb
         if r_param > 150 and g_param < 50 and b_param < 50:
@@ -76,49 +65,36 @@ class Robot:
         print('right: {}'.format(self.right_colour.rgb))
 
     def drive_forward(self):
-        # print("[ROBOT] Driving forward")
         self.left_motor.on(SpeedPercent(self.driving_speed))
         self.right_motor.on(SpeedPercent(self.driving_speed))
 
     def drive_straight_back(self):
-        # print("[ROBOT] Driving forward")
         self.left_motor.on(SpeedPercent(-self.driving_speed))
         self.right_motor.on(SpeedPercent(-self.driving_speed))
-
 
     def turn_180(self):
         self.left_motor.on(SpeedPercent(-self.turn_speed))
         self.right_motor.on(SpeedPercent(self.turn_speed))
         sleep(self.rot_time*2)
-        # print("[ROBOT] Obrot 180")
-
 
     def turn_90_right(self):
         self.left_motor.on(SpeedPercent(self.turn_speed))
         self.right_motor.on(SpeedPercent(-self.turn_speed))
         sleep(self.rot_time)
 
-
     def turn_90_left(self):
         self.left_motor.on(SpeedPercent(-self.turn_speed))
         self.right_motor.on(SpeedPercent(self.turn_speed))
         sleep(self.rot_time)
 
-
     def adjust_direction(self, direction=Direction.LEFT):
         while True:
             if direction == Direction.RIGHT:
-                # print("[ROBOT] Turning right")
                 self.right_motor.on(SpeedPercent(-(self.turn_speed-2.5)))
                 self.left_motor.on(SpeedPercent(self.turn_speed-2))
-                # self.right_motor.on(SpeedPercent(-(.5)))
-                # self.left_motor.on(SpeedPercent(TURN_SPEED))
             else:
-                # print("[ROBOT] Turning left")
                 self.left_motor.on(SpeedPercent(-(self.turn_speed-2.5)))
                 self.right_motor.on(SpeedPercent(self.turn_speed-2))
-                # self.right_motor.on(SpeedPercent(TURN_SPEED))
-                # self.left_motor.on(SpeedPercent(-0.5))
 
             left_colour, right_colour = self.get_colours()
 
@@ -133,7 +109,6 @@ class Robot:
             if right_colour == "White" and left_colour == "White":
                 break
 
-
     def pick_up_the_item(self):
         # search for the item
         while self.infrared.proximity > 30:
@@ -142,8 +117,6 @@ class Robot:
             sleep(0.5)
             print("Distance: {}".format(self.infrared.proximity))
 
-        # bylo 7
-        # bylo 8, 6, 4
         while self.infrared.proximity >= 2:
             self.drive_forward()
             print("Distance: {}".format(self.infrared.proximity))
@@ -179,9 +152,6 @@ class Robot:
 
 
     def turn_into_color_field(self, r_col, l_col, direction=Direction.LEFT):
-        # 0=left
-        # 1=right
-
         field_color = l_col
         turn_name = 'LEFT'
         if direction == Direction.RIGHT:
@@ -197,7 +167,6 @@ class Robot:
         else:
             self.turn_90_left()
         self.turn = turn_name
-
 
 def main():
     robot = Robot()
@@ -271,7 +240,6 @@ def main():
                         robot.colour = ''
 
                 else:
-                    # continue straight
                     robot.print_colours(r_col, l_col)
                     robot.print_rgb()
                     print("JADE PROSTO")
