@@ -24,12 +24,12 @@ class Robot:
 
         self.turn = ''
         self.item = False
-        self.colour = 'Red'
+        self.colour = 'red'
         self.driving_speed = 8
         self.turn_speed = 7
         self.rot_time = 3
-        self.blacks = ['Black']
-        self.fields_colours = ["Red", "Green", "Blue"]
+        self.blacks = ['black']
+        self.fields_colours = ["red", "green", "blue"]
 
     def calibrate_sensors(self):
         print("[ROBOT] Calibration started")
@@ -41,28 +41,25 @@ class Robot:
     def get_current_colour(self, colour_sensor):
         r_param, g_param, b_param = colour_sensor.rgb
         if r_param > 150 and g_param < 50 and b_param < 50:
-            return "Red"
+            return "red"
         elif r_param < 60 and g_param < 90 and b_param > 100:
-            return "Blue"
+            return "blue"
         elif r_param < 40 and g_param > 75 and b_param < 60:
-            return "Green"
+            return "green"
         elif r_param < 60 and g_param < 60 and b_param < 60:
-            return "Black"
-        return "White"
-
+            return "black"
+        return "white"
 
     def get_colours(self):
         return self.get_current_colour(self.left_colour), self.get_current_colour(self.right_colour)
 
-
-    def print_colours(self, r_color, l_color):
-        print("lewy kolor: {}".format(l_color))
-        print("prawy kolor: {}".format(r_color))
-
+    def print_colours(self, right_colour, left_colour):
+        print("[LEFT SENSOR] Left colour: {}" + left_colour)
+        print("[RIGHT SENSOR] Right colour: {}" + right_colour)
 
     def print_rgb(self):
-        print('left: {}'.format(self.left_colour.rgb))
-        print('right: {}'.format(self.right_colour.rgb))
+        print("[LEFT SENSOR] Left colour- rgb: {}" + self.left_colour.rgb)
+        print("[RIGHT SENSOR] Right colour- rgb: {}" + self.right_colour.rgb)
 
     def drive_forward(self):
         self.left_motor.on(SpeedPercent(self.driving_speed))
@@ -98,15 +95,12 @@ class Robot:
 
             left_colour, right_colour = self.get_colours()
 
-            # print("[LEFT SENSOR] Left colour:" + left_colour)
-            # print("[RIGHT SENSOR] Right colour:" + right_colour)
-
-            if right_colour == "Black" and left_colour == "Black":
+            if right_colour == "black" and left_colour == "black":
                 print("[LEFT SENSOR] Left colour:" + left_colour)
                 print("[RIGHT SENSOR] Right colour:" + right_colour)
                 break
 
-            if right_colour == "White" and left_colour == "White":
+            if right_colour == "white" and left_colour == "white":
                 break
 
     def pick_up_the_item(self):
@@ -115,11 +109,11 @@ class Robot:
             self.left_motor.on(SpeedPercent(-self.turn_speed))
             self.right_motor.on(SpeedPercent(self.turn_speed))
             sleep(0.5)
-            print("Distance: {}".format(self.infrared.proximity))
+            print("[INFRARED_SENSOR] Distance: {}".format(self.infrared.proximity))
 
         while self.infrared.proximity >= 2:
             self.drive_forward()
-            print("Distance: {}".format(self.infrared.proximity))
+            print("[INFRARED_SENSOR] Distance: {}".format(self.infrared.proximity))
 
         # ready to pick up item
         self.left_motor.on(SpeedPercent(0))
@@ -128,12 +122,11 @@ class Robot:
         sleep(2)
         self.drive_straight_back()
         self.item = True
-        print("ITEM TRUE")
+        print("[ROBOT] Item has been picked up")
         sleep(1.5)
         self.turn_180()
-        self.colour = "Blue"
-        self.blacks.append("Red")
-
+        self.colour = "blue"
+        self.blacks.append("red")
 
     def put_down_the_item(self):
         self.right_motor.on(SpeedPercent(self.turn_speed))
@@ -146,10 +139,9 @@ class Robot:
         self.drive_straight_back()
         sleep(1.5)
         self.item = False
-        print("ITEM FALSE")
+        print("[ROBOT] Item has been put down")
         self.turn_180()
-        self.colour = "Red"
-
+        self.colour = "red"
 
     def turn_into_color_field(self, r_col, l_col, direction=Direction.LEFT):
         field_color = l_col
@@ -158,8 +150,8 @@ class Robot:
             field_color = r_col
             turn_name = 'RIGHT'
         self.print_colours(r_col, l_col)
-        print("TURN_NAME: {}".format(turn_name))
-        print("SKRECAM NA KOLOR {}".format(field_color))
+        print("[ROBOT] TURN_NAME: {}".format(turn_name))
+        print("[ROBOT] Turning to colour {}".format(field_color))
         self.drive_forward()
         sleep(1.5)
         if turn_name=="RIGHT":
