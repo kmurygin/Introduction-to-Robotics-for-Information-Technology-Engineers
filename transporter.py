@@ -168,21 +168,18 @@ def main():
     while True:
             try:
                 l_col, r_col = robot.get_colours()
-                # robot.print_rgb()
-                print("WCHODZE TUTAJ 1: {}".format(r_col in robot.fields_colours and l_col == "White" and robot.turn == "" and (robot.colour == "" or r_col == robot.colour)))
-                print("WCHODZE TUTAJ 2: {}".format(l_col in robot.fields_colours and r_col == "White" and robot.turn == "" and (robot.colour == "" or l_col == robot.colour)))
 
-                if r_col in robot.blacks and l_col == "White":
+                if r_col in robot.blacks and l_col == "white":
                     # if sensors detect going off the track to the left
                     robot.adjust_direction(direction=Direction.RIGHT)
 
-                elif r_col == "White" and l_col in robot.blacks:
+                elif r_col == "white" and l_col in robot.blacks:
                     # if sensors detect going off the track to the right
                     robot.adjust_direction(direction=Direction.LEFT)
 
                 elif r_col in robot.fields_colours and l_col in robot.fields_colours:
                     # inside field color
-                    print("JESTEM W POLU KOLORU")
+                    print("[ROBOT] I am in colour field")
                     robot.print_colours(r_col, l_col)
                     l_col, r_col = robot.get_colours()
 
@@ -193,51 +190,46 @@ def main():
 
                     while r_col == robot.get_current_colour(robot.right_colour) and l_col == robot.get_current_colour(robot.left_colour):
                         # drive in color field until you're out of it
-                        print("JADE PROSTO W POLU KOLORU")
+                        print("[ROBOT] I am driving forward in colour field")
                         robot.print_colours(r_col, l_col)
                         l_col, r_col = robot.get_colours()
 
                         robot.drive_forward()
 
-                    robot.fields_colours.remove("Red")
+                    robot.fields_colours.remove("red")
 
-                elif r_col in robot.fields_colours and l_col == "White" and robot.turn == "" and (robot.colour == "" or r_col == robot.colour):
-                    # turn right and drive straight forward until there is the same color on both sensors
-                    print("WCHODZE TUTAJ 1: {}".format(r_col in robot.fields_colours and l_col == "White" and robot.turn == "" and (robot.colour == "" or r_col == robot.colour)))
+                elif r_col in robot.fields_colours and l_col == "white" and robot.turn == "" and (robot.colour == "" or r_col == robot.colour):
                     robot.turn_into_color_field(r_col, l_col, direction=Direction.RIGHT)
 
-                elif l_col in robot.fields_colours and r_col == "White" and robot.turn == "" and (robot.colour == "" or l_col == robot.colour):
-                    # turn left and drive straight forward until there is the same color on both sensors
-                    print("WCHODZE TUTAJ 2: {}".format(l_col in robot.fields_colours and r_col == "White" and robot.turn == "" and (robot.colour == "" or l_col == robot.colour)))
+                elif l_col in robot.fields_colours and r_col == "white" and robot.turn == "" and (robot.colour == "" or l_col == robot.colour):
                     robot.turn_into_color_field(r_col, l_col, direction=Direction.LEFT)
 
                 elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == "LEFT":
-                    # turn right to go back on the track after exiting color field
-                    print("DOUBLE BLACK I JAZDA W LEWO")
+                    print("[ROBOT] Double black detected, turning left")
                     sleep(1.5)
                     robot.turn_90_left()
                     robot.turn = ''
-                    robot.blacks.remove("Red")
+                    robot.blacks.remove("red")
                     if not robot.item:
                         robot.colour = ''
 
                 elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == "RIGHT":
-                    # turn left to go back on the track after exiting color field
-                    print("DOUBLE BLACK I JAZDA W PRAWO")
+                    print("[ROBOT] Double black detected, turning right")
                     sleep(1.5)
                     robot.turn_90_right()
                     robot.turn = ''
-                    robot.blacks.remove("Red")
+                    robot.blacks.remove("red")
                     if not robot.item:
                         robot.colour = ''
 
                 else:
                     robot.print_colours(r_col, l_col)
                     robot.print_rgb()
-                    print("JADE PROSTO")
+                    print("[ROBOT] Driving forward")
                     robot.drive_forward()
 
-            except Exception:
+            except Exception as e:
+                print("[ERROR]" + str(e))
                 continue
 
 
