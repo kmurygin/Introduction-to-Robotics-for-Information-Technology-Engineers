@@ -72,7 +72,7 @@ class Robot:
     def turn_180(self):
         self.left_motor.on(SpeedPercent(-self.turn_speed))
         self.right_motor.on(SpeedPercent(self.turn_speed))
-        sleep(self.rot_time*2)
+        sleep(self.rot_time * 2)
 
     def turn_90_right(self):
         self.left_motor.on(SpeedPercent(self.turn_speed))
@@ -87,11 +87,11 @@ class Robot:
     def adjust_direction(self, direction=Direction.LEFT):
         while True:
             if direction == Direction.RIGHT:
-                self.right_motor.on(SpeedPercent(-(self.turn_speed-2.5)))
-                self.left_motor.on(SpeedPercent(self.turn_speed-2))
+                self.right_motor.on(SpeedPercent(-(self.turn_speed - 2.5)))
+                self.left_motor.on(SpeedPercent(self.turn_speed - 2))
             else:
-                self.left_motor.on(SpeedPercent(-(self.turn_speed-2.5)))
-                self.right_motor.on(SpeedPercent(self.turn_speed-2))
+                self.left_motor.on(SpeedPercent(-(self.turn_speed - 2.5)))
+                self.right_motor.on(SpeedPercent(self.turn_speed - 2))
 
             left_colour, right_colour = self.get_colours()
 
@@ -154,83 +154,86 @@ class Robot:
         print("[ROBOT] Turning to colour {}".format(field_color))
         self.drive_forward()
         sleep(1.5)
-        if turn_name=="RIGHT":
+        if turn_name == "RIGHT":
             self.turn_90_right()
         else:
             self.turn_90_left()
         self.turn = turn_name
 
+
 def main():
     robot = Robot()
-
     robot.calibrate_sensors()
 
     while True:
-            try:
+        try:
+            l_col, r_col = robot.get_colours()
+
+            if r_col in robot.blacks and l_col == "white":
+                # if sensors detect going off the track to the left
+                robot.adjust_direction(direction=Direction.RIGHT)
+
+            elif r_col == "white" and l_col in robot.blacks:
+                # if sensors detect going off the track to the right
+                robot.adjust_direction(direction=Direction.LEFT)
+
+            elif r_col in robot.fields_colours and l_col in robot.fields_colours:
+                # inside field color
+                print("[ROBOT] I am in colour field")
+                robot.print_colours(r_col, l_col)
                 l_col, r_col = robot.get_colours()
 
-                if r_col in robot.blacks and l_col == "white":
-                    # if sensors detect going off the track to the left
-                    robot.adjust_direction(direction=Direction.RIGHT)
+                if not robot.item:
+                    robot.pick_up_the_item()
+                else:
+                    robot.put_down_the_item()
 
-                elif r_col == "white" and l_col in robot.blacks:
-                    # if sensors detect going off the track to the right
-                    robot.adjust_direction(direction=Direction.LEFT)
-
-                elif r_col in robot.fields_colours and l_col in robot.fields_colours:
-                    # inside field color
-                    print("[ROBOT] I am in colour field")
+                while r_col == robot.get_current_colour(robot.right_colour) and l_col == robot.get_current_colour(
+                        robot.left_colour):
+                    # drive in color field until you're out of it
+                    print("[ROBOT] I am driving forward in colour field")
                     robot.print_colours(r_col, l_col)
                     l_col, r_col = robot.get_colours()
 
-                    if not robot.item:
-                        robot.pick_up_the_item()
-                    else:
-                        robot.put_down_the_item()
-
-                    while r_col == robot.get_current_colour(robot.right_colour) and l_col == robot.get_current_colour(robot.left_colour):
-                        # drive in color field until you're out of it
-                        print("[ROBOT] I am driving forward in colour field")
-                        robot.print_colours(r_col, l_col)
-                        l_col, r_col = robot.get_colours()
-
-                        robot.drive_forward()
-
-                    robot.fields_colours.remove("red")
-
-                elif r_col in robot.fields_colours and l_col == "white" and robot.turn == "" and (robot.colour == "" or r_col == robot.colour):
-                    robot.turn_into_color_field(r_col, l_col, direction=Direction.RIGHT)
-
-                elif l_col in robot.fields_colours and r_col == "white" and robot.turn == "" and (robot.colour == "" or l_col == robot.colour):
-                    robot.turn_into_color_field(r_col, l_col, direction=Direction.LEFT)
-
-                elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == "LEFT":
-                    print("[ROBOT] Double black detected, turning left")
-                    sleep(1.5)
-                    robot.turn_90_left()
-                    robot.turn = ''
-                    robot.blacks.remove("red")
-                    if not robot.item:
-                        robot.colour = ''
-
-                elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == "RIGHT":
-                    print("[ROBOT] Double black detected, turning right")
-                    sleep(1.5)
-                    robot.turn_90_right()
-                    robot.turn = ''
-                    robot.blacks.remove("red")
-                    if not robot.item:
-                        robot.colour = ''
-
-                else:
-                    robot.print_colours(r_col, l_col)
-                    robot.print_rgb()
-                    print("[ROBOT] Driving forward")
                     robot.drive_forward()
 
-            except Exception as e:
-                print("[ERROR]" + str(e))
-                continue
+                robot.fields_colours.remove("red")
+
+            elif r_col in robot.fields_colours and l_col == "white" and robot.turn == "" and (
+                    robot.colour == "" or r_col == robot.colour):
+                robot.turn_into_color_field(r_col, l_col, direction=Direction.RIGHT)
+
+            elif l_col in robot.fields_colours and r_col == "white" and robot.turn == "" and (
+                    robot.colour == "" or l_col == robot.colour):
+                robot.turn_into_color_field(r_col, l_col, direction=Direction.LEFT)
+
+            elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == "LEFT":
+                print("[ROBOT] Double black detected, turning left")
+                sleep(1.5)
+                robot.turn_90_left()
+                robot.turn = ''
+                robot.blacks.remove("red")
+                if not robot.item:
+                    robot.colour = ''
+
+            elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == "RIGHT":
+                print("[ROBOT] Double black detected, turning right")
+                sleep(1.5)
+                robot.turn_90_right()
+                robot.turn = ''
+                robot.blacks.remove("red")
+                if not robot.item:
+                    robot.colour = ''
+
+            else:
+                robot.print_colours(r_col, l_col)
+                robot.print_rgb()
+                print("[ROBOT] Driving forward")
+                robot.drive_forward()
+
+        except Exception as e:
+            print("[ERROR]" + str(e))
+            continue
 
 
 if __name__ == "__main__":
