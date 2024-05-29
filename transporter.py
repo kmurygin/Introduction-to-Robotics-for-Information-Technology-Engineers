@@ -23,11 +23,11 @@ class Robot:
         self.infrared = InfraredSensor(INPUT_1)
 
         self.turn = ''
-        self.item = False
-        self.colour = 'red'
+        self.is_item = False
+        self.next_colour = 'red'
         self.driving_speed = 8
         self.turn_speed = 7
-        self.rot_time = 3
+        self.rotation_time = 3
         self.blacks = ['black']
         self.fields_colours = ["red", "green", "blue"]
 
@@ -72,17 +72,17 @@ class Robot:
     def turn_180(self):
         self.left_motor.on(SpeedPercent(-self.turn_speed))
         self.right_motor.on(SpeedPercent(self.turn_speed))
-        sleep(self.rot_time * 2)
+        sleep(self.rotation_time * 2)
 
     def turn_90_right(self):
         self.left_motor.on(SpeedPercent(self.turn_speed))
         self.right_motor.on(SpeedPercent(-self.turn_speed))
-        sleep(self.rot_time)
+        sleep(self.rotation_time)
 
     def turn_90_left(self):
         self.left_motor.on(SpeedPercent(-self.turn_speed))
         self.right_motor.on(SpeedPercent(self.turn_speed))
-        sleep(self.rot_time)
+        sleep(self.rotation_time)
 
     def adjust_direction(self, direction=Direction.LEFT):
         while True:
@@ -121,11 +121,11 @@ class Robot:
         self.medium_motor.on_for_degrees(SpeedPercent(5), 60)
         sleep(2)
         self.drive_straight_back()
-        self.item = True
+        self.is_item = True
         print("[ROBOT] Item has been picked up")
         sleep(1.5)
         self.turn_180()
-        self.colour = "blue"
+        self.next_colour = "blue"
         self.blacks.append("red")
 
     def put_down_the_item(self):
@@ -138,23 +138,23 @@ class Robot:
         sleep(2)
         self.drive_straight_back()
         sleep(1.5)
-        self.item = False
+        self.is_item = False
         print("[ROBOT] Item has been put down")
         self.turn_180()
-        self.colour = "red"
+        self.next_colour = "red"
 
-    def turn_into_color_field(self, r_col, l_col, direction=Direction.LEFT):
-        field_color = l_col
-        turn_name = 'LEFT'
+    def turn_into_color_field(self, right_colour, left_colour, direction=Direction.LEFT):
+        field_color = left_colour
+        turn_name = Direction.LEFT
         if direction == Direction.RIGHT:
-            field_color = r_col
-            turn_name = 'RIGHT'
-        self.print_colours(r_col, l_col)
+            field_color = right_colour
+            turn_name = Direction.RIGHT
+        self.print_colours(right_colour, left_colour)
         print("[ROBOT] TURN_NAME: {}".format(turn_name))
         print("[ROBOT] Turning to colour {}".format(field_color))
         self.drive_forward()
         sleep(1.5)
-        if turn_name == "RIGHT":
+        if turn_name == Direction.RIGHT:
             self.turn_90_right()
         else:
             self.turn_90_left()
@@ -183,7 +183,7 @@ def main():
                 robot.print_colours(r_col, l_col)
                 l_col, r_col = robot.get_colours()
 
-                if not robot.item:
+                if not robot.is_item:
                     robot.pick_up_the_item()
                 else:
                     robot.put_down_the_item()
@@ -200,30 +200,30 @@ def main():
                 robot.fields_colours.remove("red")
 
             elif r_col in robot.fields_colours and l_col == "white" and robot.turn == "" and (
-                    robot.colour == "" or r_col == robot.colour):
+                    robot.next_colour == "" or r_col == robot.next_colour):
                 robot.turn_into_color_field(r_col, l_col, direction=Direction.RIGHT)
 
             elif l_col in robot.fields_colours and r_col == "white" and robot.turn == "" and (
-                    robot.colour == "" or l_col == robot.colour):
+                    robot.next_colour == "" or l_col == robot.next_colour):
                 robot.turn_into_color_field(r_col, l_col, direction=Direction.LEFT)
 
-            elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == "LEFT":
+            elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == Direction.LEFT:
                 print("[ROBOT] Double black detected, turning left")
                 sleep(1.5)
                 robot.turn_90_left()
                 robot.turn = ''
                 robot.blacks.remove("red")
-                if not robot.item:
-                    robot.colour = ''
+                if not robot.is_item:
+                    robot.next_colour = ''
 
-            elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == "RIGHT":
+            elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == Direction.RIGHT:
                 print("[ROBOT] Double black detected, turning right")
                 sleep(1.5)
                 robot.turn_90_right()
                 robot.turn = ''
                 robot.blacks.remove("red")
-                if not robot.item:
-                    robot.colour = ''
+                if not robot.is_item:
+                    robot.next_colour = ''
 
             else:
                 robot.print_colours(r_col, l_col)
