@@ -14,6 +14,9 @@ class Direction(Enum):
 
 class Robot:
     def __init__(self):
+        """
+        Sets up initial values for variables, the motors and colour sensors with proper inputs and outputs.
+        """
         self.left_motor = LargeMotor(OUTPUT_A)
         self.right_motor = LargeMotor(OUTPUT_B)
         self.medium_motor = MediumMotor(OUTPUT_D)
@@ -32,6 +35,9 @@ class Robot:
         self.fields_colours = ["red", "green", "blue"]
 
     def calibrate_sensors(self):
+        """
+        Calibrates the colour sensors to white.
+        """
         print("[ROBOT] Calibration started")
         self.right_colour.calibrate_white()
         self.left_colour.calibrate_white()
@@ -39,6 +45,15 @@ class Robot:
         sleep(2)
 
     def get_current_colour(self, colour_sensor):
+        """
+        Returns the current colour detected by given colour sensor.
+
+        Args:
+            colour_sensor (ColorSensor): The color sensor to read from.
+
+        Returns:
+            str: The color detected by the sensor.
+        """
         r_param, g_param, b_param = colour_sensor.rgb
         if r_param > 150 and g_param < 50 and b_param < 50:
             return "red"
@@ -51,40 +66,77 @@ class Robot:
         return "white"
 
     def get_colours(self):
+        """
+        Returns the current colours detected by both colour sensors.
+
+        Returns:
+            tuple: The colours detected by the left and right sensors.
+        """
         return self.get_current_colour(self.left_colour), self.get_current_colour(self.right_colour)
 
     def print_colours(self, right_colour, left_colour):
-        print("[LEFT SENSOR] Left colour: {}" + left_colour)
-        print("[RIGHT SENSOR] Right colour: {}" + right_colour)
+        """
+        Prints the colours detected by both sensors.
+
+        Args:
+            right_colour (str): The color detected by the right sensor.
+            left_colour (str): The color detected by the left sensor.
+        """
+        print("[LEFT SENSOR] Left colour: {}".format(left_colour))
+        print("[RIGHT SENSOR] Right colour: {}".format(right_colour))
 
     def print_rgb(self):
-        print("[LEFT SENSOR] Left colour- rgb: {}" + self.left_colour.rgb)
-        print("[RIGHT SENSOR] Right colour- rgb: {}" + self.right_colour.rgb)
+        """
+        Prints the RGB values detected by robot's both colour sensors.
+        """
+        print("[LEFT SENSOR] Left colour- rgb: {}".format(self.left_colour.rgb))
+        print("[RIGHT SENSOR] Right colour- rgb: {}".format(self.right_colour.rgb))
 
     def drive_forward(self):
+        """
+        Drives the robot forward at the set driving speed.
+        """
         self.left_motor.on(SpeedPercent(self.driving_speed))
         self.right_motor.on(SpeedPercent(self.driving_speed))
 
     def drive_straight_back(self):
+        """
+        Drives the robot straight backward at the set driving speed.
+        """
         self.left_motor.on(SpeedPercent(-self.driving_speed))
         self.right_motor.on(SpeedPercent(-self.driving_speed))
 
     def turn_180(self):
+        """
+        Turns the robot 180 degrees.
+        """
         self.left_motor.on(SpeedPercent(-self.turn_speed))
         self.right_motor.on(SpeedPercent(self.turn_speed))
         sleep(self.rotation_time * 2)
 
     def turn_90_right(self):
+        """
+        Turns the robot 90 degrees to the right.
+        """
         self.left_motor.on(SpeedPercent(self.turn_speed))
         self.right_motor.on(SpeedPercent(-self.turn_speed))
         sleep(self.rotation_time)
 
     def turn_90_left(self):
+        """
+        Turns the robot 90 degrees to the left.
+        """
         self.left_motor.on(SpeedPercent(-self.turn_speed))
         self.right_motor.on(SpeedPercent(self.turn_speed))
         sleep(self.rotation_time)
 
     def adjust_direction(self, direction=Direction.LEFT):
+        """
+        Adjusts the robot's direction to follow the line.
+
+        Args:
+            direction (Direction): The direction to adjust towards.
+        """
         while True:
             if direction == Direction.RIGHT:
                 self.right_motor.on(SpeedPercent(-(self.turn_speed - 2.5)))
@@ -104,7 +156,9 @@ class Robot:
                 break
 
     def pick_up_the_item(self):
-        # search for the item
+        """
+        Searches for and picks up the item using the infrared sensor and medium motor.
+        """
         while self.infrared.proximity > 30:
             self.left_motor.on(SpeedPercent(-self.turn_speed))
             self.right_motor.on(SpeedPercent(self.turn_speed))
@@ -129,6 +183,9 @@ class Robot:
         self.blacks.append("red")
 
     def put_down_the_item(self):
+        """
+        Puts down the item using the medium motor.
+        """
         self.right_motor.on(SpeedPercent(self.turn_speed))
         self.left_motor.on(SpeedPercent(self.turn_speed))
         sleep(.5)
@@ -144,6 +201,14 @@ class Robot:
         self.next_colour = "red"
 
     def turn_into_color_field(self, right_colour, left_colour, direction=Direction.LEFT):
+        """
+        Turns the robot into the color field based on the detected colours and direction.
+
+        Args:
+            right_colour (str): The colour detected by the right sensor.
+            left_colour (str): The colour detected by the left sensor.
+            direction (Direction): The direction to turn towards.
+        """
         field_color = left_colour
         turn_name = Direction.LEFT
         if direction == Direction.RIGHT:
@@ -162,6 +227,9 @@ class Robot:
 
 
 def main():
+    """
+    Main function for transporter task.
+    """
     robot = Robot()
     robot.calibrate_sensors()
 
