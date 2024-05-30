@@ -8,14 +8,8 @@ from enum import Enum
 
 
 DRIVING_SPEED = 10
-TURN_SPEED = 4
+TURN_SPEED = 7
 
-# 8, 9
-
-# almost working
-# TURN_SPEED = 15 -> 13
-# DRIVING_SPEED = 8 ->10
-# 2.5, 2
 
 class Direction(Enum):
     LEFT = 0
@@ -31,8 +25,6 @@ class Robot:
         self.left_colour = ColorSensor(INPUT_2)
         self.right_colour = ColorSensor(INPUT_3)
         self.infrared = InfraredSensor(INPUT_1)
-        # self.touch_sensor = TouchSensor(INPUT_3)
-
 
     def calibrate_sensors(self):
         print("[ROBOT] Calibration started")
@@ -41,29 +33,23 @@ class Robot:
         print("[ROBOT] Calibration finished")
         sleep(1)
 
-
     def get_current_colour(self, colour_sensor):
         r_param, g_param, b_param = colour_sensor.rgb
         if r_param > 150 and g_param < 50 and b_param < 50:
             return "red"
         elif r_param < 60 and g_param < 90 and b_param > 100:
             return "blue"
-        elif r_param < 40 and g_param > 75 and b_param < 60:
-            return "green"
         elif r_param < 60 and g_param < 60 and b_param < 60:
             return "black"
         return "white"
 
-
     def get_colours(self):
         return self.get_current_colour(self.left_colour), self.get_current_colour(self.right_colour)
-
 
     def drive_forward(self):
         print("[ROBOT] Driving forward")
         self.left_motor.on(SpeedPercent(DRIVING_SPEED))
         self.right_motor.on(SpeedPercent(DRIVING_SPEED))
-
 
     def adjust_direction(self, direction=Direction.LEFT):
         while True:
@@ -71,19 +57,12 @@ class Robot:
                 print("[ROBOT] Turning right")
                 self.right_motor.on(SpeedPercent(-(TURN_SPEED-2.5)))
                 self.left_motor.on(SpeedPercent(TURN_SPEED-2))
-                # self.right_motor.on(SpeedPercent(-(.5)))
-                # self.left_motor.on(SpeedPercent(TURN_SPEED))
             else:
                 print("[ROBOT] Turning left")
                 self.left_motor.on(SpeedPercent(-(TURN_SPEED-2.5)))
                 self.right_motor.on(SpeedPercent(TURN_SPEED-2))
-                # self.right_motor.on(SpeedPercent(TURN_SPEED))
-                # self.left_motor.on(SpeedPercent(-0.5))
             
             left_colour, right_colour = self.get_colours()
-
-            # print("[LEFT SENSOR] Left colour:" + left_colour)
-            # print("[RIGHT SENSOR] Right colour:" + right_colour)
 
             if right_colour == "black" and left_colour == "black":
                 print("[LEFT SENSOR] Left colour:" + left_colour)
@@ -104,9 +83,6 @@ def main():
 
     while True:
         try:
-            # if robot.touch_sensor.is_pressed:
-            #     robot.stop()
-            #     break
             left_colour, right_colour = robot.get_colours()
             if right_colour == "black" and left_colour == "white":
                 robot.adjust_direction(Direction.RIGHT)
