@@ -39,8 +39,6 @@ class Robot:
             return "red"
         elif r_param < 60 and g_param < 90 and b_param > 100:
             return "blue"
-        elif r_param < 40 and g_param > 75 and b_param < 60:
-            return "green"
         elif r_param < 60 and g_param < 60 and b_param < 60:
             return "black"
         return "white"

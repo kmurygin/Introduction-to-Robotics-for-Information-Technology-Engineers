@@ -31,8 +31,8 @@ class Robot:
         self.driving_speed = 8
         self.turn_speed = 7
         self.rotation_time = 3
-        self.blacks = ['black']
-        self.fields_colours = ["red", "green", "blue"]
+        self.black_colours = ['black']
+        self.fields_colours = ["red", "blue"]
 
     def calibrate_sensors(self):
         """
@@ -59,8 +59,6 @@ class Robot:
             return "red"
         elif r_param < 60 and g_param < 90 and b_param > 100:
             return "blue"
-        elif r_param < 40 and g_param > 75 and b_param < 60:
-            return "green"
         elif r_param < 60 and g_param < 60 and b_param < 60:
             return "black"
         return "white"
@@ -180,7 +178,7 @@ class Robot:
         sleep(1.5)
         self.turn_180()
         self.next_colour = "blue"
-        self.blacks.append("red")
+        self.black_colours.append("red")
 
     def put_down_the_item(self):
         """
@@ -237,11 +235,11 @@ def main():
         try:
             l_col, r_col = robot.get_colours()
 
-            if r_col in robot.blacks and l_col == "white":
+            if r_col in robot.black_colours and l_col == "white":
                 # if sensors detect going off the track to the left
                 robot.adjust_direction(direction=Direction.RIGHT)
 
-            elif r_col == "white" and l_col in robot.blacks:
+            elif r_col == "white" and l_col in robot.black_colours:
                 # if sensors detect going off the track to the right
                 robot.adjust_direction(direction=Direction.LEFT)
 
@@ -275,21 +273,21 @@ def main():
                     robot.next_colour == "" or l_col == robot.next_colour):
                 robot.turn_into_color_field(r_col, l_col, direction=Direction.LEFT)
 
-            elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == Direction.LEFT:
+            elif r_col in robot.black_colours and l_col in robot.black_colours and robot.turn == Direction.LEFT:
                 print("[ROBOT] Double black detected, turning left")
                 sleep(1.5)
                 robot.turn_90_left()
                 robot.turn = ''
-                robot.blacks.remove("red")
+                robot.black_colours.remove("red")
                 if not robot.is_item:
                     robot.next_colour = ''
 
-            elif r_col in robot.blacks and l_col in robot.blacks and robot.turn == Direction.RIGHT:
+            elif r_col in robot.black_colours and l_col in robot.black_colours and robot.turn == Direction.RIGHT:
                 print("[ROBOT] Double black detected, turning right")
                 sleep(1.5)
                 robot.turn_90_right()
                 robot.turn = ''
-                robot.blacks.remove("red")
+                robot.black_colours.remove("red")
                 if not robot.is_item:
                     robot.next_colour = ''
 
